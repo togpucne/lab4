@@ -53,14 +53,40 @@ if(window.location.pathname == "/manage"){//since items are listed on manage
     })
 }
 
-if(window.location.pathname == "/purchase"){
-//$("#purchase_table").hide();
 
-$("#drug_days").submit(function(event){//on a submit event on the element with id add_drug
-    event.preventDefault();//prevent default submit behaviour
-    $("#purchase_table").show();
-    days = +$("#days").val();
-    alert("Drugs for " + days + " days!");//alert this in the browser
-})
 
+if (window.location.pathname == "/purchase") {
+  $("#drug_days").submit(function (event) {
+    event.preventDefault();
+
+    let days = +$("#days").val();
+
+    // giữ nguyên value trong ô input (không xóa)
+    $("#days").val(days);
+
+    // gọi API để lấy danh sách thuốc
+    $.get("/api/drugs", function (drugs) {
+      let tbody = $("#purchase_table tbody");
+      tbody.empty();
+
+      drugs.forEach((drug, index) => {
+        let pills = days * drug.perDay;
+        let cardsToBuy = Math.ceil(pills / drug.card);
+        let packsToBuy = Math.ceil(pills / drug.pack);
+        let cardPerPack = (drug.pack / drug.card).toFixed(2);
+        let cardLabel = cardPerPack < 2 ? "card" : "cards";
+
+        tbody.append(`
+          <tr>
+            <td>${index + 1}</td>
+            <td>${drug.name}</td>
+            <td>${cardsToBuy} (${cardPerPack} ${cardLabel} per pack)</td>
+            <td>${packsToBuy}</td>
+          </tr>
+        `);
+      });
+
+      $("#purchase_table").show();
+    });
+  });
 }

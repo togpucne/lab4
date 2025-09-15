@@ -43,10 +43,11 @@ exports.dosage= function(req, res) {
 }
 
 exports.purchase= function(req, res) {
+    let days = req.query.days || 30;
     // Make a get request to /api/users
     axios.get(`${BASE_URI}:${PORT}/api/drugs`)//get request to pull drugs
         .then(function(response){
-            res.render('purchase', { drugs : response.data, title: 'Purchase Drugs' });// response from API request stored as drugs to display on manage.ejs
+            res.render('purchase', { drugs : response.data, days: days, title: 'Purchase Drugs' });// response from API request stored as drugs to display on manage.ejs
         })
         .catch(err =>{
             res.send(err);
